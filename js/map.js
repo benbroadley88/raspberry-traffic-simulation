@@ -15,7 +15,7 @@ var map = (function(){
 	}
 	var _createCanvas = function(){
 		canvas = document.createElement('canvas');
-		canvas.id = map;
+		canvas.id = "map";
 		_resizeCanvas();
 		document.getElementsByTagName("body")[0].appendChild(canvas);
 		ctx = canvas.getContext("2d");
