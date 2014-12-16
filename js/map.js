@@ -1,32 +1,84 @@
 var NodeList = (function(){
 	var list = [];
-	
-	var add = function(obj){
-		list.push(new Node(obj));
+	var links = [];
+	var add = function(node){
+		if(node instanceof Node){
+			list.push(node);
+		}else{
+			return false;
+		}
+	}
+	var addLink = function(link){
+		if(link instanceof NodeLink){
+			links.push(link);
+		}else{
+			return false;
+		}
 	}
 	var get = function(id){
 		return list[id];
 	}
-	var removeNode = function(){
+	var removeNode = function(id){
 		// required?
 	}
 	return {
 		addNode: add,
-		getNode: get
+		addLink: addLink,
+		getNode: get,
+		getList: list,
+		getNodeLinks: links
 	}
 })();
 
-var Node = function Node(obj){
-	var x;
-	var y;
-	var cost;
-	this.x = obj.x;
-	this.y = obj.y;
-	this.cost = obj.cost;
+var NodeLink = function(from,to){
+	if(from === to){
+		return;
+	}
+	this.from = from;
+	this.to = to;
+	this.cost = 1;
+	this.draw = function(){
+		var fromNode = NodeList.getNode(this.from);
+		var toNode = NodeList.getNode(this.to);
+		ctx.beginPath();
+		ctx.moveTo(fromNode.x,fromNode.y);
+		ctx.lineTo(toNode.x,toNode.y);
+		ctx.lineWidth = this.cost / 2;
+		if(this.cost < 20){
+			ctx.strokeStyle = "black";
+		}else{
+			ctx.strokeStyle = "red";
+		}
+		ctx.stroke();
+	}
 }
 
+var Node = function Node(x,y,cost){
+	this.x = x;
+	this.y = y;
+	this.cost = cost;
+	this.draw = function(){
+		ctx.beginPath();
+		
+		if(this.cost < 20){
+			ctx.fillStyle = "black";
+		}else{
+			ctx.fillStyle = "red";
+		}
+		ctx.arc(this.x,this.y,Math.min(this.cost/2,10),0,Math.PI*2, true);
+		ctx.closePath();
+		ctx.fill();
+	}
+	this.increaseCost = function(){
+		this.cost ++;
+	}
+	this.decreaseCost = function(){
+		this.cost --;
+	}
+}
+
+var canvas, ctx;
 var map = (function(){
-	var canvas, ctx;
 	
 	var _init = function(){
 		//create the canvas element
@@ -52,21 +104,24 @@ var map = (function(){
 		canvas.height = window.innerHeight;
 	}
 	var _draw = function(){
-		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		_drawLinks();
 		_drawNodes();
-		
 		
 		//begin the animation loop
 		window.requestAnimationFrame(_draw);
 	}
 	
 	var _drawNodes = function(){
-		
+		for(var i = 0; i < NodeList.getList.length; i++){
+			NodeList.getList[i].draw();
+		}	
 	}
 	
 	var _drawLinks = function(){
-	
+		for(var i = 0; i < NodeList.getNodeLinks.length; i++){
+			NodeList.getNodeLinks[i].draw();
+		}
 	}
 	
 	
@@ -79,3 +134,19 @@ var map = (function(){
 	
 	}
 })();
+
+
+
+
+
+//lets procedurally generate some random nodes
+for(var i = 0; i<10; i++){
+	NodeList.addNode(new Node(Math.random()*window.innerWidth,Math.random()*window.innerHeight,1));
+	
+	var from = Math.ceil(Math.random() * 10) -1;
+	var to = Math.ceil(Math.random() * 10) -1;
+	while(to === from){
+		to = Math.ceil(Math.random() * 10) -1;
+	}
+	NodeList.addLink(new NodeLink(from,to));
+}
