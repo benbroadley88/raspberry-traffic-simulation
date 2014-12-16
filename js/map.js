@@ -1,3 +1,30 @@
+var NodeList = (function(){
+	var list = [];
+	
+	var add = function(obj){
+		list.push(new Node(obj));
+	}
+	var get = function(id){
+		return list[id];
+	}
+	var removeNode = function(){
+		// required?
+	}
+	return {
+		addNode: add,
+		getNode: get
+	}
+})();
+
+var Node = function Node(obj){
+	var x;
+	var y;
+	var cost;
+	this.x = obj.x;
+	this.y = obj.y;
+	this.cost = obj.cost;
+}
+
 var map = (function(){
 	var canvas, ctx;
 	
@@ -25,7 +52,21 @@ var map = (function(){
 		canvas.height = window.innerHeight;
 	}
 	var _draw = function(){
-		console.log("draw");
+		
+		_drawLinks();
+		_drawNodes();
+		
+		
+		//begin the animation loop
+		window.requestAnimationFrame(_draw);
+	}
+	
+	var _drawNodes = function(){
+		
+	}
+	
+	var _drawLinks = function(){
+	
 	}
 	
 	
